@@ -25,6 +25,7 @@
 			if ($num>0) {
 				$_SESSION['user_login'] = $get_user_uname_db;
 				setcookie('user_login', $user_login, time() + (365 * 24 * 60 * 60), "/");
+
 				
 				if (isset($_REQUEST['ono'])) {
 					$ono = mysql_real_escape_string($_REQUEST['ono']);
