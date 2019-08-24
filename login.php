@@ -1,210 +1,219 @@
-<?php include __DIR__ . '/config/config.php'; ?>
-<?php include __DIR__ .'/config/paths.php'; ?>
+<?php 
 
-<?php include INC .'header.php'; ?>
+	include __DIR__ . '/config/config.php';
+	include __DIR__ . '/config/paths.php';
+	include __DIR__ . '/config/connect.php'; 
 
-<div class="page-content header-home">
-  <div class="media-column w-50"></div>
-  <div class="container">
-  <div class="row">
-    <div class="col-md-6">
-      <img class="img-fluid login-image" src="<?php echo $BASE_URL ?>assets/images/login.jpg" alt="Hello">
-    </div>
-    <div class="col-md-4 offset-md-2">
-      <div class="form-login js-login-form">
-        <div class="form-login__block js-form-block is-selected" id="signin">
-          <form action="/" method="post">
-            <div class="form-container">
-              <h3 class="form-title t-center">Sign In</h3>
-              
-              <div class="form-group">
-                <label for="login-user">Username or Email</label>
-                <input
-                  type="text"
-                  name="login-user"
-                  id="login-user"
-                  class="form-input form-input--pill form-input--border-c-gallery"
-                  required  
-                  placehol  
-                >
-              </div><!-- .form-group -->
+	
 
-              <div class="form-group">
-                <label for="login-password">Password</label>
-                <input
-                  type="password"
-                  name="login-password"
-                  id="login-password"
-                  class="form-input form-input--pill form-input--border-c-gallery"
-                  required
-                  placeholder="******"
-                >
-              </div><!-- .form-group -->
+	// Check if the user is already logged in, if yes then redirect him to welcome page
+	 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){ ?>
+		<script>
+			window.location.assign('artisan/index.php');
+		</script>
+	<?php } 
+	
+	// Define variables and initialize with empty values
+	$username = $password = "";
+	$username_err = $password_err = "";
 
-              <div class="form-group">
-                <div class="form-group__container">
-                  <label for="remember-me" class="icheck_label">
-                    <input type="checkbox" id="remember-me" name="iCheck">
-                    Remember Me
-                  </label>
-                  <a href="#reset" class="c-gray js-block-trigger">Forgot Password?</a>
-                </div><!-- .form-group__container -->
-              </div><!-- .form-group -->
+	// Processing form data when form is submitted
+	if($_SERVER["REQUEST_METHOD"] == "POST"){
+	
+		// Check if username is empty
+		if(empty(trim($_POST["username"]))){
+			$username_err = "Please enter username.";
+		} else{
+			$username = trim($_POST["username"]);
+		}
+		
+		// Check if password is empty
+		if(empty(trim($_POST["password"]))){
+			$password_err = "Please enter your password.";
+		} else{
+			$password = trim($_POST["password"]);
+		}
+		
+		// Validate credentials
+		if(empty($username_err) && empty($password_err)){
+			// Prepare a select statement
+			$sql = "SELECT id, username, passkey FROM members WHERE username = :username";
+			
+			if($stmt = $pdo->prepare($sql)){
+				// Bind variables to the prepared statement as parameters
+				$stmt->bindParam(":username", $param_username, PDO::PARAM_STR);
+				
+				// Set parameters
+				$param_username = trim($_POST["username"]);
+				
+				// Attempt to execute the prepared statement
+				if($stmt->execute()){
 
-              <div class="form-group--submit">
-                <button
-                  class="button button--primary button--pill button--large button--block button--submit"
-                  type="submit"
-                >
-                  Log In
-                </button>
-              </div>
+					// Check if username exists, if yes then verify password
+					if($stmt->rowCount() == 1){
+						if($row = $stmt->fetch()){
 
-              <div class="form-group--footer">
-                <span class="c-gray">
-                  Don't have an account? <a href="#signup" class="c-secondary t-underline js-block-trigger">Register</a>
-                </span>
-              </div>
-            </div><!-- .form-container -->
-          </form><!-- .signin -->
-        </div><!-- .form-login__block -->
+							$id = $row["id"];
+							$username = $row["username"];
+							$hashed_password = $row["passkey"];
 
-        <div class="form-login__block js-form-block" id="signup">
-          <form>
-            <div class="form-container">
-              <h3 class="form-title t-center">Sign Up</h3>
-              <div class="form-social">
-                <div class="form-group">
-                  <div class="form-group__wrapper">
-                    <button
-                      class="button button--social button--twitter button--pill button--large button--block"
-                      type="button"
-                    >
-                      Connect to Twitter
-                    </button>
-                    <span class="form-group__icon form-group__icon--social">
-                    <i class="fa fa-twitter c-white"></i>
-                  </span>
-                  </div><!-- .form-group__wrapper -->
-                </div><!-- .form-group -->
+							if(password_verify($password, $hashed_password)){
+								// Password is correct, so start a new session
+								session_start();
+								
+								// Store data in session variables
+								$_SESSION["loggedin"] = true;
+								$_SESSION["id"] = $id;
+								$_SESSION["username"] = $username;                            
+								
+								// Redirect user to welcome page
+								header("location: welcome.php");
+								exit;
 
-                <div class="form-group">
-                  <div class="form-group__wrapper">
-                    <button
-                      class="button button--social button--facebook button--pill button--large button--block"
-                      type="button"
-                    >
-                      Connect to Facebook
-                    </button>
-                    <span class="form-group__icon form-group__icon--social">
-                    <i class="fa fa-facebook-f c-white"></i>
-                  </span>
-                  </div><!-- .form-group__wrapper -->
-                </div><!-- .form-group -->
-              </div><!-- .form-social -->
-              <div class="form-group">
-                <label for="signup-email">Email *</label>
-                <input
-                  type="email"
-                  name="signup-email"
-                  id="signup-email"
-                  class="form-input form-input--pill form-input--border-c-gallery"
-                  required
-                  placeholder="johndoe@gmail.com"
-                >
-              </div><!-- .form-group -->
-
-              <div class="form-group">
-                <label for="signup-name">Name *</label>
-                <input
-                  type="text"
-                  name="signup-name"
-                  id="signup-name"
-                  class="form-input form-input--pill form-input--border-c-gallery"
-                  required
-                  placeholder="John Doe"
-                >
-              </div><!-- .form-group -->
-
-              <div class="form-group">
-                <label for="signup-password">Confirm new password *</label>
-                <input
-                  type="password"
-                  name="signup-password"
-                  id="signup-password"
-                  class="form-input form-input--pill form-input--border-c-gallery"
-                  required
-                  placeholder="******"
-                >
-              </div><!-- .form-group -->
-
-              <div class="form-group">
-              <span class="c-gray">
-                By creating an account your agree to our <a href="#" class="t-underline">Terms and Conditions</a>
-                and our <a href="#" class="t-underline">Privacy Policy</a>
-              </span>
-              </div><!-- .form-group -->
-
-              <div class="form-group--submit">
-                <button
-                  class="button button--primary button--pill button--large button--block button--submit"
-                  type="submit"
-                >
-                  Sign Up
-                </button>
-              </div>
-
-              <div class="form-group--footer">
-              <span class="c-gray">
-                Already have an account?
-                <a href="#signin" class="c-secondary t-underline js-block-trigger">Sign in</a>
-              </span>
-              </div>
-            </div><!-- .form-container -->
-          </form><!-- .signup -->
-        </div><!-- .form-login__block -->
-
-        <div class="form-login__block js-form-block" id="reset">
-          <form action="/" method="post">
-            <div class="form-container">
-              <div class="form-group">
-                <label for="reset-password">Email</label>
-                <input
-                  type="email"
-                  name="reset-password"
-                  id="reset-password"
-                  class="form-input form-input--pill form-input--border-c-gallery"
-                  placeholder="johndoe@gmail.com"
-                  required
-                >
-              </div><!-- .form-group -->
-
-              <div class="form-group--submit">
-                <button
-                  class="button button--primary button--pill button--large button--block button--submit"
-                  type="submit"
-                >
-                  Reset Password
-                </button>
-              </div>
-
-              <div class="form-group--footer">
-                <a href="#signin" class="c-secondary t-underline js-block-trigger">Back to Sign in</a>
-              </div>
-            </div><!-- .form-container -->
-          </form><!-- .reset -->
-        </div><!-- .form-login__block -->
-
-      </div><!-- .form-login -->
-    </div><!-- .col -->
-  </div><!-- .row -->
-</div><!-- .container -->
-</div><!-- .page-content -->
+							} else {
+								// Display an error message if password is not valid
+								$password_err = "The password you entered was not valid.";
+							}
+						}
+					} else {
+						// Display an error message if username doesn't exist
+						$username_err = "No account found with that username.";
+					}
+				} else{
+					echo "Oops! Something went wrong. Please try again later.";
+				}
+			}
+			
+			// Close statement
+			unset($stmt);
+		}
+		
+		// Close connection
+		unset($pdo);
+	}
+	
+?>
 
 
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBDyCxHyc8z9gMA5IlipXpt0c33Ajzqix4"></script>
-<script src="https://cdn.rawgit.com/googlemaps/v3-utility-library/master/infobox/src/infobox.js"></script>
-<script src="assets/scripts/app.js"></script>
-</body>
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title> <?php echo $TITLE; ?> | Login </title>
+		<meta name="description" content="Grandin is a Dashboard & Admin Site Responsive Template by hencework." />
+		<meta name="keywords" content="admin, admin dashboard, admin template, cms, crm, Grandin Admin, Grandinadmin, premium admin templates, responsive admin, sass, panel, software, ui, visualization, web app, application" />
+		<meta name="author" content="hencework"/>
+		
+		<!-- Favicon -->
+		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		
+		<!-- vector map CSS -->
+		<link href="<?php echo $BASE_URL; ?>vendors/bower_components/jasny-bootstrap/dist/css/jasny-bootstrap.min.css" rel="stylesheet" type="text/css"/>
+		
+		
+		
+		<!-- Custom CSS -->
+		<link href="<?php echo $BASE_URL; ?>admin/dist/css/style.css" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<!--Preloader-->
+		<div class="preloader-it">
+			<div class="la-anim-1"></div>
+		</div>
+		<!--/Preloader-->
+		
+		<div class="wrapper pa-0">
+			<header class="sp-header">
+				<div class="sp-logo-wrap pull-left">
+					<a href="index.html">
+						<h4 class="white-text bold-text">Marketplace</h4>
+					</a>
+				</div>
+				<!-- <div class="form-group mb-0 pull-right">
+					<span class="inline-block pr-10">Don't have an account?</span>
+					<a class="inline-block btn btn-primary  btn-rounded" href="signup.html">Sign Up</a>
+				</div> -->
+				<div class="clearfix"></div>
+			</header>
+			
+			<!-- Main Content -->
+			<div id="login-bg" class="page-wrapper pa-0 ma-0 auth-page">
+				<div class="container-fluid">
+					<!-- Row -->
+					<div class="table-struct full-width full-height">
+						<div class="table-cell vertical-align-middle auth-form-wrap">
+							<div id="cus-card" class="auth-form  ml-auto mr-auto no-float card-view pt-30 pb-30">
+								<div class="row">
+									<div class="col-sm-12 col-xs-12">
+										<div class="mb-30">
+											<h3 class="text-center txt-light mb-10">Sign in</h3>
+											<?php if(isset($fmsg)) {
+                                            	?><div class="alert alert-danger" role="alert"> <?php echo $fmsg; ?> </div> <?php
+                                        	} ?>
+										</div>	
+										<div class="form-wrap">
+											<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+												<div class="form-group">
+													<label class="control-label mb-10" for="username">Username</label>
+													<input id="input-round" type="text" name="username" class="form-control" required="" id="" placeholder="Enter email">
+												</div>
+												<div class="form-group">
+													<label class="pull-left control-label mb-10" for="password">Password</label>
+													<a class="capitalize-font txt-primary block mb-10 pull-right font-12" href="forgot-password.html">forgot password ?</a>
+													<div class="clearfix"></div>
+													<input id="input-round" type="password" name="password" class="form-control" required="" id="" placeholder="Enter pwd">
+												</div>
+												
+												<div class="form-group">
+													<div class="checkbox checkbox-primary pr-10 pull-left">
+														<input id="checkbox_2" required="" type="checkbox">
+														<label for="checkbox_2"> Keep me logged in</label>
+													</div>
+													<div class="clearfix"></div>
+												</div>
+												<div class="form-group">
+													<div class="checkbox checkbox-primary pr-5">
+														<a style="text-decoration: underline" class="capitalize-font txt-info block mb-10 pull-left font-12" href="forgot-password.html">Become a Merchant </a>
+														<a style="text-decoration: underline" class="capitalize-font txt-info block mb-10 pull-right font-12" href="forgot-password.html">Become a Buyer </a>
+													</div>
+													<div class="clearfix"></div>
+												</div>
+												<div class="form-group text-center">
+													<input type="submit" name="login" value="sign in" class="btn btn-primary btn-rounded">
+												</div>
+											</form>
+										</div>
+									</div>	
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /Row -->	
+				</div>
+				
+			</div>
+			<!-- /Main Content -->
+		
+		</div>
+		<!-- /#wrapper -->
+		
+		<!-- JavaScript -->
+		
+		<!-- jQuery -->
+		<script src="<?php echo $BASE_URL; ?>vendors/bower_components/jquery/dist/jquery.min.js"></script>
+		
+		<!-- Bootstrap Core JavaScript -->
+		<script src="<?php echo $BASE_URL; ?>vendors/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="<?php echo $BASE_URL; ?>vendors/bower_components/jasny-bootstrap/dist/js/jasny-bootstrap.min.js"></script>
+		
+		<!-- Slimscroll JavaScript -->
+		<script src="<?php echo $BASE_URL; ?>admin/dist/js/jquery.slimscroll.js"></script>
+		
+		<!-- Init JavaScript -->
+		<script src="<?php echo $BASE_URL; ?>admin/dist/js/init.js"></script>
+	</body>
 </html>

@@ -83,7 +83,7 @@
 
                   <!-- client modal -->
                   <div class="col cst-padding package-client">
-                    <a href="<?php echo $BASE_URL ?>registerclient.php">
+                    <a href="<?php echo $BASE_URL; ?>registerclient.php">
                       <div class="package">
                         <div class="package-header">
                           <img src="https://craftsman.pebas.rs/wp-content/uploads/2017/08/become_client_modal.jpg" alt="craftsman-membership">

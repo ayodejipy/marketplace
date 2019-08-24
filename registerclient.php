@@ -28,7 +28,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $param_firstname = trim($_POST["first_name"]);
       
       // Attempt to execute the prepared statement
-      $stmt->execute();
+      if($stmt->execute()) {
+        $firstname = trim($_POST["first_name"]);
+      } else {
+        echo "Something went wrong. Please try again...";
+      }
     }
      
     // Close statement
@@ -50,7 +54,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $param_lastname = trim($_POST["last_name"]);
       
       // Attempt to execute the prepared statement
-      $stmt->execute();
+      if($stmt->execute()) {
+        $lastname = trim($_POST["last_name"]);
+      } else {
+        echo "Something went wrong. Please try again...";
+      }
     }
      
   }
@@ -137,7 +145,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         if($stmt->rowCount() == 1){
             $phone_err = "This phone number is already in use.";
         } else{
-            $phone = trim($_POST["username"]);
+            $phone = trim($_POST["phone"]);
         }
       } else{
         echo "Oops! Something went wrong. Please try again later.";
@@ -172,8 +180,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(empty($firstname_err) && empty($lastname_err) && empty($username_err) && empty($phone_err) && empty($email_err)  && empty($password_err) && empty($confirm_password_err)){
       
     // Prepare an insert statement
-    $sql = "INSERT INTO `members`(`f_name`, `l_name`, `username`, `email`, `password`,`phone`, `role`)
-    VALUES (:firstname, :lastname, :email, :phone, :username, :role, :password)";
+    $sql = "INSERT INTO `members` (`f_name`, `l_name`, `username`, `email`, `passkey`, `phone`, `u_role`)
+            VALUES (:firstname, :lastname, :username, :email, :passkey, :phone, :u_role )";
      
     if($stmt = $pdo->prepare($sql)){
         // Bind variables to the prepared statement as parameters
@@ -182,7 +190,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $stmt->bindParam(":username", $param_username, PDO::PARAM_STR);
         $stmt->bindParam(":email", $param_email, PDO::PARAM_STR);
         $stmt->bindParam(":phone", $param_phone, PDO::PARAM_STR);
-        $stmt->bindParam(":password", $param_password, PDO::PARAM_STR);
+        $stmt->bindParam(":passkey", $param_password, PDO::PARAM_STR);
+        $stmt->bindParam(":u_role", $param_role, PDO::PARAM_STR);
         
         // Set parameters
         $param_firstname = $firstname;
@@ -190,20 +199,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $param_username = $username;
         $param_email = $email;
         $param_phone = $phone;
-        $role = "client";
+        $param_role = "client";
         $param_password = password_hash($password, PASSWORD_DEFAULT); // Creates a password hash
         
         
         // Attempt to execute the prepared statement
         if($stmt->execute()){
-
-            // Redirect to login page
-            // header("location: login.php");
-
-            var_dump($stmt);
-            
-        } else{
-            echo "Something went wrong. Please try again later.";
+          // Redirect to login page
+          header("location: login2.php");
+          // var_dump($stmt);
+        } else {
+          echo "Something went wrong. Please try again later.";
         }
     }
        
@@ -238,39 +244,40 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       <div class="col-md-6 offset-md-3">
 
         <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-            <div class="form-row my-2">
-                
-              <div class="col-sm-6">
-                <label for="businessName">First Name</label>
-                <input type="text" name="first_name" class="form-control" id="businessName" placeholder="Ajanaku,">
-              </div>
-              <div class="col-sm-6">
-                <label for="businessName">Last Name</label>
-                <input type="text" name="last_name" class="form-control" id="businessName" placeholder="Seun">
-              </div>
+          <div class="form-row my-2">
+              
+            <div class="col-sm-6">
+              <label for="clientName">First Name</label>
+              <input type="text" name="first_name" class="form-control" id="frstName" placeholder="Enter Your First Name..." required>
             </div>
-            <div class="form-group">
-              <label for="WhatIdo">Username</label>
-              <input type="text" name="username" class="form-control" id="WhatIdo" placeholder="Kokokashoes">
+            <div class="col-sm-6">
+              <label for="clientName">Last Name</label>
+              <input type="text" name="last_name" class="form-control" id="lastName" placeholder="Enter Your Last Name" required>
             </div>
-            <div class="form-group">
-              <label for="merchEmail">Email</label>
-              <input type="email" name="email" class="form-control" id="merchEmail" aria-describedby="emailHelp" placeholder="Enter email">
-            </div>
-            <div class="form-group">
-              <label for="phoneNumber">Phone Number</label>
-              <input type="tel" name="phone" class="form-control" id="" placeholder="Phone">
-            </div>            
-            <div class="form-group">
-              <label class="text-bold" for="Password">Password</label>
-              <input type="password" name="password" class="form-control" id="Password" placeholder="Password">
-            </div>
-            <div class="form-group">
-              <label class="text-bold" for="password">Confirm password</label>
-              <input type="password" name="confirm_password" class="form-control" id="conf_password" placeholder="Confirm password">
-            </div>
+          </div>
+          <div class="form-group">
+            <label for="WhatIdo">Username</label>
+            <input type="text" name="username" class="form-control" id="user" placeholder="Kokokashoes..." required>
+          </div>
+          <div class="form-group">
+            <label for="merchEmail">Email</label>
+            <input type="email" name="email" class="form-control" id="merchEmail" aria-describedby="emailHelp" placeholder="Enter email" required>
+          </div>
+          <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="tel" name="phone" class="form-control" id="" placeholder="Phone" required>
+          </div>            
+          <div class="form-group">
+            <label class="text-bold" for="Password">Password</label>
+            <input type="password" name="password" class="form-control" id="Password" placeholder="Password" required>
+          </div>
 
-            <input type="submit" class="btn btn-primary" value="Submit"> 
+          <div class="form-group">
+            <label class="text-bold" for="password">Confirm password</label>
+            <input type="password" name="confirm_password" class="form-control" id="conf_password" placeholder="Confirm password" required>
+          </div>
+
+          <input type="submit" class="btn btn-primary" value="Become a member"> 
           
         </form>
 
