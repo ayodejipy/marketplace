@@ -329,7 +329,7 @@
     if(empty($firstname_err) && empty($lastname_err) && empty($username_err) && empty($phone_err) && empty($email_err)  && empty($password_err) && empty($confirm_password_err)){
         
       // Prepare an insert statement
-      $sql = "INSERT INTO `members` (`f_name`, `l_name`, `username`, `passkey`, `business_name`, `business_cat`, `business_exp`, `business_mail`, `business_phone`, `phone`, `u_role`)
+      $sql = "INSERT INTO `members` (`firstname`, `lastname`, `username`, `passkey`, `business_name`, `business_cat`, `business_exp`, `business_mail`, `business_phone`, `phone`, `u_role`)
               VALUES (:firstname, :lastname, :username, :passkey, :businessname, :businesscat, :expertise, :businessmail, :businessphone, :phone, :u_role )";
       
       if($stmt = $pdo->prepare($sql)){
@@ -364,16 +364,11 @@
           
           // Attempt to execute the prepared statement
           if($stmt->execute()){
-
-            
             // Redirect to login page
-            // header("location: login.php");
-            // var_dump($stmt);
-
-            
-              
+            header("location: login.php"); 
+            exit;   
           } else {
-            echo " Something went wrong. Please try again later.";
+            echo "Something went wrong. Please try again later.";
           }
       }
         
@@ -433,16 +428,16 @@
             </div>
             <div class="form-group">
               <label for="WhatIdo">Expertise/What do you do?</label>
-              <input type="text" name="expertise" class="form-control" id="WhatIdo" placeholder="ones">
+              <input type="text" name="expertise" class="form-control" id="WhatIdo" placeholder="Mecedes Benz" required="">
             </div>
             <div class="form-group">
               <label for="artEmail">Business Email</label>
-              <input type="email" name="businessmail" class="form-control" id="artEmail" aria-describedby="emailHelp" placeholder="Enter email">
+              <input type="email" name="businessmail" class="form-control" id="artEmail" aria-describedby="emailHelp" placeholder="Enter email" required="">
               
             </div>
             <div class="form-group">
               <label for="phoneNumber">Business Phone Number</label>
-              <input type="tel" name="businessphone" class="form-control" id="WhatIdo" placeholder="Phone">
+              <input type="tel" name="businessphone" class="form-control" id="WhatIdo" placeholder="Phone" required="">
             </div>
             
             <input type="button" id="next"  name="next" class=" btn btn-info" value="Next" />
@@ -452,31 +447,31 @@
             <h2> Personal Details</h2>
             <div class="form-group">
               <label for="first_name">First Name</label>
-              <input type="text" name="firstname" class="form-control" name="first_name" id="first_name" placeholder="First Name" required>
+              <input type="text" name="firstname" class="form-control" name="first_name" id="first_name" placeholder="First Name" required="">
             </div>
             <div class="form-group">
               <label for="last_name">Last Name</label>
-              <input type="text" name="lastname" class="form-control" name="last_name" id="last_name" required placeholder="Last Name">
+              <input type="text" name="lastname" class="form-control" name="last_name" id="last_name" placeholder="Last Name" required="">
             </div>
             <div class="form-group">
               <label for="first_name">Username</label>
-              <input type="text" name="username" class="form-control" name="first_name" id="user_name" required placeholder="Username">
+              <input type="text" name="username" class="form-control" name="first_name" id="user_name" placeholder="Username" required="">
             </div>
             <div class="form-group">
               <label for="phone">Phone</label>
-              <input type="tel" name="phone" class="form-control" name="phone" id="" required placeholder="Phone">
+              <input type="tel" name="phone" class="form-control" name="phone" id="" placeholder="Phone" required="">
             </div>
             <div class="form-group">
               <label class="text-bold" for="Password">Password</label>
-              <input type="password" name="password" class="form-control" id="" placeholder="Password">
+              <input type="password" name="password" class="form-control" id="" placeholder="Password" required="">
             </div>
             <div class="form-group">
               <label class="text-bold" for="Password">Confirm password</label>
-              <input type="password" name="confirm_pass" class="form-control" id="" placeholder="Password">
+              <input type="password" name="confirm_pass" class="form-control" id="" placeholder="Password" required="">
             </div>
 
 
-            <input type="button" id="prev" name="previous" class="btn btn-default" value="Previous" />
+            <input type="button" id="prev" name="previous" class="btn btn-info" value="Previous" />
             <input type="submit" class=" btn btn-success" value="Become an Artisan" />
           </fieldset>
 

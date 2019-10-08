@@ -10,9 +10,8 @@ define('DB_PASSWORD', '');
 define('DB_NAME', 'sch.marketplace');
 
 //Report Errors
-error_reporting(E_ALL);
 ini_set('display_errors', '1');
-
+error_reporting(E_ALL);
 
 try {
 

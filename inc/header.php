@@ -8,7 +8,7 @@
   <title><?php echo $TITLE; ?> - <?php echo $TAGLINE; ?></title>
   <link href="https://fonts.googleapis.com/css?family=Cabin:400,600" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Nunito&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
   <link rel="stylesheet" href="<?php echo $BASE_URL ?>assets/styles/style.css">
 </head>
 
@@ -17,7 +17,7 @@
   <div class="container">
     <div class="d-lg-flex justify-content-lg-between align-items-lg-center site-header__container">
       <div class="site-header__logo">
-        <a href="<?php echo $BASE_URL ?>">
+        <a href="<?php echo $BASE_URL; ?>">
           <h1 class="screen-reader-text">MarketPlace</h1>
         </a>
       </div>
@@ -33,9 +33,7 @@
             <button class="button button--small button--pill button--primary d-none d-lg-inline-block" data-toggle="modal" data-target="#exampleModal">
               &plus; Membership
             </button>
-          <a href="login.html" class="sign-in">
-            <i class="fa fa-user"></i> Sign in
-          </a>
+          <a href="login.php" class="sign-in"> <i class="fa fa-user"></i> Sign in</a>
         </div>
       </div>
 
@@ -63,14 +61,14 @@
 
                   <!-- craftsman modal -->
                   <div class="col cst-padding package-craftsman">
-                    <a href="<?php echo $BASE_URL ?>registerbusiness.php">
+                    <a href="registerbusiness.php">
                       <div class="package">
                         <div class="package-header">
-                          <img src="https://craftsman.pebas.rs/wp-content/uploads/2017/08/become_craftsman_modal.jpg" alt="craftsman-membership">
+                          <img src="https://www.nappy.co/wp-content/uploads/2019/09/7Z8A0091_Output.jpg" alt="craftsman-membership">
                         </div>
                         <div class="package-content">
                           <p>Boost your business</p>
-                          <h4>Become Merchant</h4>
+                          <h4>Become an Artisan</h4>
                             
                           <!-- Delimiter-->
                           <div class="delimiter">
@@ -83,14 +81,14 @@
 
                   <!-- client modal -->
                   <div class="col cst-padding package-client">
-                    <a href="<?php echo $BASE_URL; ?>registerclient.php">
+                    <a href="registerclient.php">
                       <div class="package">
                         <div class="package-header">
-                          <img src="https://craftsman.pebas.rs/wp-content/uploads/2017/08/become_client_modal.jpg" alt="craftsman-membership">
+                          <img src="https://images.unsplash.com/photo-1530124566582-a618bc2615dc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80" alt="craftsman-membership">
                         </div>
                         <div class="package-content">
-                          <p>Get a job done!</p>
-                          <h4>Add Project</h4>
+                          <p>Find service professionals</p>
+                          <h4>Get a Job Done </h4>
                         </div>
                       </div>
                     </a>

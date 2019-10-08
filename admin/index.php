@@ -22,7 +22,7 @@
 	<link href="<?php echo $BASE_URL; ?>vendors/bower_components/jquery-toast-plugin/dist/jquery.toast.min.css" rel="stylesheet" type="text/css">
 	
 	<!-- Custom CSS -->
-	<link href="dist/css/style.css" rel="stylesheet" type="text/css">
+	<link href="resources/dist/css/style.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -566,8 +566,8 @@
 	<script src="<?php echo $BASE_URL; ?>vendors/bower_components/switchery/dist/switchery.min.js"></script>
 	
 	<!-- Init JavaScript -->
-	<script src="dist/js/init.js"></script>
-	<script src="dist/js/dashboard-data.js"></script>
+	<script src="resources/dist/js/init.js"></script>
+	<script src="resources/dist/js/dashboard-data.js"></script>
 </body>
 
 </html>

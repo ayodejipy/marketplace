@@ -159,28 +159,28 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
   // Validate password
   if(empty(trim($_POST["password"]))){
-      $password_err = "Please enter a password.";     
+    $password_err = "Please enter a password.";     
   } elseif(strlen(trim($_POST["password"])) < 6){
-      $password_err = "Password must have atleast 6 characters.";
+    $password_err = "Password must have atleast 6 characters.";
   } else{
-      $password = trim($_POST["password"]);
+    $password = trim($_POST["password"]);
   }
   
   // Validate confirm password
   if(empty(trim($_POST["confirm_password"]))){
-      $confirm_password_err = "Please confirm password.";     
-  } else{
-      $confirm_password = trim($_POST["confirm_password"]);
-      if(empty($password_err) && ($password != $confirm_password)){
-          $confirm_password_err = "Password did not match.";
-      }
+    $confirm_password_err = "Please confirm password.";     
+  } else {
+    $confirm_password = trim($_POST["confirm_password"]);
+    if(empty($password_err) && ($password != $confirm_password)){
+      $confirm_password_err = "Password did not match.";
+    }
   }
     
   // Check input errors before inserting in database
   if(empty($firstname_err) && empty($lastname_err) && empty($username_err) && empty($phone_err) && empty($email_err)  && empty($password_err) && empty($confirm_password_err)){
       
     // Prepare an insert statement
-    $sql = "INSERT INTO `members` (`f_name`, `l_name`, `username`, `email`, `passkey`, `phone`, `u_role`)
+    $sql = "INSERT INTO `members` (`firstname`, `lastname`, `username`, `email`, `passkey`, `phone`, `u_role`)
             VALUES (:firstname, :lastname, :username, :email, :passkey, :phone, :u_role )";
      
     if($stmt = $pdo->prepare($sql)){
@@ -202,12 +202,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $param_role = "client";
         $param_password = password_hash($password, PASSWORD_DEFAULT); // Creates a password hash
         
-        
         // Attempt to execute the prepared statement
         if($stmt->execute()){
           // Redirect to login page
-          header("location: login2.php");
-          // var_dump($stmt);
+          header("location: login.php");
         } else {
           echo "Something went wrong. Please try again later.";
         }

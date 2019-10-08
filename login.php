@@ -7,11 +7,10 @@
 	
 
 	// Check if the user is already logged in, if yes then redirect him to welcome page
-	 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){ ?>
-		<script>
-			window.location.assign('artisan/index.php');
-		</script>
-	<?php } 
+	//  if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){ 
+	// 	header("location: artisan/index.php");
+    // 	exit;
+	// } 
 	
 	// Define variables and initialize with empty values
 	$username = $password = "";
@@ -37,7 +36,7 @@
 		// Validate credentials
 		if(empty($username_err) && empty($password_err)){
 			// Prepare a select statement
-			$sql = "SELECT id, username, passkey FROM members WHERE username = :username";
+			$sql = "SELECT id, username, passkey, u_role FROM members WHERE username = :username";
 			
 			if($stmt = $pdo->prepare($sql)){
 				// Bind variables to the prepared statement as parameters
@@ -55,20 +54,38 @@
 
 							$id = $row["id"];
 							$username = $row["username"];
+							$role = $row["u_role"];
 							$hashed_password = $row["passkey"];
 
 							if(password_verify($password, $hashed_password)){
+								
+								$smsg = "Login Successful! Redirecting";
+
 								// Password is correct, so start a new session
 								session_start();
 								
 								// Store data in session variables
-								$_SESSION["loggedin"] = true;
-								$_SESSION["id"] = $id;
-								$_SESSION["username"] = $username;                            
+								$_SESSION['loggedin'] = true;
+								$_SESSION['id'] = $id;
+								$_SESSION['username'] = $username;
+								$_SESSION['role'] = $role;                
 								
-								// Redirect user to welcome page
-								header("location: welcome.php");
-								exit;
+								if($role == "admin") {
+									// Redirect user to admin page
+									header("location: admin/index.php");
+									exit;	
+									
+								} elseif($role == "artisan"){
+									// Redirect user to artisan page
+									header("location: artisan/index.php");
+									exit;
+
+								} else {
+									// Redirect user to client page
+									header("location: client/index.php");
+									exit;
+								}
+								
 
 							} else {
 								// Display an error message if password is not valid
@@ -77,10 +94,10 @@
 						}
 					} else {
 						// Display an error message if username doesn't exist
-						$username_err = "No account found with that username.";
+						$username_err = "No Account found with that username.";
 					}
-				} else{
-					echo "Oops! Something went wrong. Please try again later.";
+				} else {
+					$err = "Cannot process your login at the moment. Please try again later.";
 				}
 			}
 			
@@ -117,7 +134,7 @@
 		
 		
 		<!-- Custom CSS -->
-		<link href="<?php echo $BASE_URL; ?>admin/dist/css/style.css" rel="stylesheet" type="text/css">
+		<link href="<?php echo $BASE_URL; ?>resources/dist/css/style.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
 		<!--Preloader-->
@@ -150,22 +167,28 @@
 								<div class="row">
 									<div class="col-sm-12 col-xs-12">
 										<div class="mb-30">
-											<h3 class="text-center txt-light mb-10">Sign in</h3>
-											<?php if(isset($fmsg)) {
-                                            	?><div class="alert alert-danger" role="alert"> <?php echo $fmsg; ?> </div> <?php
-                                        	} ?>
+											<h3 class="text-center txt-dark mb-10">Sign in</h3>
+
+											<?php if(isset($username_err) && !empty($username_err)): ?>
+												<div class="alert alert-danger" role="alert"> <?php echo $username_err; ?> </div>
+											<?php elseif(isset($password_err) && !empty($password_err)): ?>
+												<div class="alert alert-danger" role="alert"> <?php echo $password_err; ?> </div>
+											<?php endif; ?>
 										</div>	
 										<div class="form-wrap">
 											<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-												<div class="form-group">
+											
+												<div class="form-group <?php echo (!empty($username_err)) ? 'has-error' : ''; ?>">
 													<label class="control-label mb-10" for="username">Username</label>
-													<input id="input-round" type="text" name="username" class="form-control" required="" id="" placeholder="Enter email">
+													<input id="input-round" type="text" name="username" class="form-control" required="" id="" value="<?php echo $username; ?>">
+													<span class="help-block"></span>
 												</div>
-												<div class="form-group">
+												<div class="form-group <?php echo (!empty($password_err)) ? 'has-error' : ''; ?>">
 													<label class="pull-left control-label mb-10" for="password">Password</label>
 													<a class="capitalize-font txt-primary block mb-10 pull-right font-12" href="forgot-password.html">forgot password ?</a>
 													<div class="clearfix"></div>
-													<input id="input-round" type="password" name="password" class="form-control" required="" id="" placeholder="Enter pwd">
+													<input id="input-round" type="password" name="password" value="<?php echo $password; ?>" class="form-control" required="" id="">
+													<span class="help-block"></span>
 												</div>
 												
 												<div class="form-group">
@@ -177,8 +200,8 @@
 												</div>
 												<div class="form-group">
 													<div class="checkbox checkbox-primary pr-5">
-														<a style="text-decoration: underline" class="capitalize-font txt-info block mb-10 pull-left font-12" href="forgot-password.html">Become a Merchant </a>
-														<a style="text-decoration: underline" class="capitalize-font txt-info block mb-10 pull-right font-12" href="forgot-password.html">Become a Buyer </a>
+														<a style="text-decoration: underline" class="capitalize-font txt-info block mb-10 pull-left font-12" href="registerbusiness.php">Become a Merchant </a>
+														<a style="text-decoration: underline" class="capitalize-font txt-info block mb-10 pull-right font-12" href="registerclient.php">Become a Buyer </a>
 													</div>
 													<div class="clearfix"></div>
 												</div>
@@ -211,9 +234,9 @@
 		<script src="<?php echo $BASE_URL; ?>vendors/bower_components/jasny-bootstrap/dist/js/jasny-bootstrap.min.js"></script>
 		
 		<!-- Slimscroll JavaScript -->
-		<script src="<?php echo $BASE_URL; ?>admin/dist/js/jquery.slimscroll.js"></script>
+		<script src="<?php echo $BASE_URL; ?>resources/dist/js/jquery.slimscroll.js"></script>
 		
 		<!-- Init JavaScript -->
-		<script src="<?php echo $BASE_URL; ?>admin/dist/js/init.js"></script>
+		<script src="<?php echo $BASE_URL; ?>resources/dist/js/init.js"></script>
 	</body>
 </html>
